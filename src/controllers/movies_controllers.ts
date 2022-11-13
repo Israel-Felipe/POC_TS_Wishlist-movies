@@ -3,6 +3,7 @@ import {
   insert_movie,
   get_movies,
   watch_movie,
+  remove_movie,
 } from "../repositories/movies_repositories.js";
 import { Movie, Watch } from "../types/movies_types.js";
 
@@ -42,4 +43,16 @@ async function update_movie(req: Request, res: Response) {
   }
 }
 
-export { create_movie, read_movies, update_movie };
+async function delete_movie(req: Request, res: Response) {
+  const { id } = req.params;
+
+  try {
+    await remove_movie(Number(id));
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+}
+
+export { create_movie, read_movies, update_movie, delete_movie };

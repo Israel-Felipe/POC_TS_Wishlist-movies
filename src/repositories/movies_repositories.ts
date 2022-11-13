@@ -64,10 +64,21 @@ async function query_movie_id(id: number): Promise<QueryResult<Movie_entity>> {
   );
 }
 
+function remove_movie(id: number): void {
+  connection.query(
+    `
+      DELETE FROM movies 
+      WHERE id = $1;
+  `,
+    [id]
+  );
+}
+
 export {
   insert_movie,
   get_movies,
   query_movie_title,
   watch_movie,
   query_movie_id,
+  remove_movie,
 };
