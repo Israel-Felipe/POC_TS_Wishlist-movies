@@ -4,6 +4,8 @@ import {
   query_platform,
 } from "../repositories/platforms_repositories.js";
 
+import { query_movies } from "../repositories/movies_repositories.js";
+
 import { create_movie_schema } from "../schemas/movies_schemas.js";
 import { Movie_entity } from "../types/movies_types.js";
 
@@ -12,7 +14,7 @@ async function validate_create_movie(
   res: Response,
   next: NextFunction
 ) {
-  const { platform } = req.body;
+  const { platform, title } = req.body;
 
   const { error } = create_movie_schema.validate(req.body as Movie_entity);
 
@@ -23,8 +25,12 @@ async function validate_create_movie(
   }
 
   try {
+    const title_movie_value = (await query_movies(title)).rows[0];
+    if (title_movie_value) {
+      return res.status(409).send({ message: "title already exists" });
+    }
+
     const platform_value = (await query_platform(platform)).rows[0];
-    console.log(platform_value);
 
     if (!platform_value) {
       const platformId = (await create_platform(platform)).rows[0];

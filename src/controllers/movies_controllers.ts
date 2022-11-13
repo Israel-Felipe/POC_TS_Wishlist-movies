@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { insertMovie } from "../repositories/movies_repositories.js";
+import {
+  insert_movie,
+  get_movies,
+} from "../repositories/movies_repositories.js";
 import { Movie } from "../types/movies_types.js";
 
 async function create_movie(req: Request, res: Response) {
@@ -7,7 +10,7 @@ async function create_movie(req: Request, res: Response) {
   const platform_id = res.locals.platform_id;
 
   try {
-    await insertMovie(movie, Number(platform_id));
+    await insert_movie(movie, Number(platform_id));
     return res.sendStatus(201);
   } catch (error) {
     console.error(error);
@@ -15,4 +18,14 @@ async function create_movie(req: Request, res: Response) {
   }
 }
 
-export { create_movie };
+async function read_movies(req: Request, res: Response) {
+  try {
+    const movies_list = (await get_movies()).rows;
+    return res.status(200).send(movies_list);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+}
+
+export { create_movie, read_movies };
