@@ -1,14 +1,20 @@
 import { QueryResult } from "pg";
 import connection from "../database/db.js";
-import { Movie, Movie_entity } from "../types/movies_types.js";
+import { Movie, Movie_entity, Watch } from "../types/movies_types.js";
 
 function insert_movie(movie: Movie, platform_id: number): void {
   connection.query(
     `
-        INSERT INTO movies (title, platform_id, genre, status, note) 
+        INSERT INTO movies (title, platform_id, genre, was_assisted, movie_review) 
         VALUES ($1, $2, $3, $4, $5);
     `,
-    [movie.title, platform_id, movie.genre, movie.status, movie.note]
+    [
+      movie.title,
+      platform_id,
+      movie.genre,
+      movie.was_assisted,
+      movie.movie_review,
+    ]
   );
 }
 
@@ -17,16 +23,18 @@ async function get_movies(): Promise<QueryResult<Movie_entity>> {
       SELECT
       movies.id,
       movies.title,
-      movies.status,
+      movies.was_assisted,
       movies.genre,
-      movies.note,
+      movies.movie_review,
       platforms.name AS platform
       FROM movies
       JOIN platforms ON movies.platform_id = platforms.id;
   `);
 }
 
-async function query_movies(title: string): Promise<QueryResult<Movie_entity>> {
+async function query_movie_title(
+  title: string
+): Promise<QueryResult<Movie_entity>> {
   return await connection.query(
     `
         SELECT * FROM movies WHERE title = $1;
@@ -35,4 +43,31 @@ async function query_movies(title: string): Promise<QueryResult<Movie_entity>> {
   );
 }
 
-export { insert_movie, get_movies, query_movies };
+function watch_movie(id: number, watch: Watch): void {
+  connection.query(
+    `
+      UPDATE movies
+      SET was_assisted = TRUE,
+      movie_review = $1
+      WHERE id = $2;
+  `,
+    [watch.movie_review, id]
+  );
+}
+
+async function query_movie_id(id: number): Promise<QueryResult<Movie_entity>> {
+  return await connection.query(
+    `
+        SELECT * FROM movies WHERE id = $1;
+    `,
+    [id]
+  );
+}
+
+export {
+  insert_movie,
+  get_movies,
+  query_movie_title,
+  watch_movie,
+  query_movie_id,
+};

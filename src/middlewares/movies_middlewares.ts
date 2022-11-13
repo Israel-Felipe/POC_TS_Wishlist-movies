@@ -4,7 +4,10 @@ import {
   query_platform,
 } from "../repositories/platforms_repositories.js";
 
-import { query_movies } from "../repositories/movies_repositories.js";
+import {
+  query_movie_title,
+  query_movie_id,
+} from "../repositories/movies_repositories.js";
 
 import { create_movie_schema } from "../schemas/movies_schemas.js";
 import { Movie_entity } from "../types/movies_types.js";
@@ -25,7 +28,7 @@ async function validate_create_movie(
   }
 
   try {
-    const title_movie_value = (await query_movies(title)).rows[0];
+    const title_movie_value = (await query_movie_title(title)).rows[0];
     if (title_movie_value) {
       return res.status(409).send({ message: "title already exists" });
     }
@@ -46,4 +49,24 @@ async function validate_create_movie(
   }
 }
 
-export { validate_create_movie };
+async function validate_update_and_delete_movie(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.params;
+
+  try {
+    const movie = (await query_movie_id(Number(id))).rows[0];
+
+    if (!movie) {
+      return res.sendStatus(404);
+    }
+    next();
+  } catch (error) {
+    console.error;
+    res.sendStatus(500);
+  }
+}
+
+export { validate_create_movie, validate_update_and_delete_movie };
