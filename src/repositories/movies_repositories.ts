@@ -74,6 +74,17 @@ function remove_movie(id: number): void {
   );
 }
 
+async function get_filtred_by_platform(): Promise<QueryResult> {
+  return await connection.query(`
+      SELECT 
+      COUNT(*) AS "movies_amount",
+      platforms.name AS platform
+      FROM movies
+      JOIN platforms ON movies.platform_id = platforms.id
+      GROUP BY platform;
+  `);
+}
+
 export {
   insert_movie,
   get_movies,
@@ -81,4 +92,5 @@ export {
   watch_movie,
   query_movie_id,
   remove_movie,
+  get_filtred_by_platform,
 };

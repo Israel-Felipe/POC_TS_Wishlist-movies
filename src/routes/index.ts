@@ -5,6 +5,7 @@ import {
   read_movies,
   update_movie,
   delete_movie,
+  filter_movies,
 } from "../controllers/movies_controllers.js";
 import {
   validate_create_movie,
@@ -17,5 +18,6 @@ router.post("/movies", validate_create_movie, create_movie);
 router.get("/movies", read_movies);
 router.put("/movies/:id", validate_update_and_delete_movie, update_movie);
 router.delete("/movies/:id", validate_update_and_delete_movie, delete_movie);
+router.get("/movies/filtered", filter_movies);
 
 export default router;

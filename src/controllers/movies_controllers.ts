@@ -4,6 +4,7 @@ import {
   get_movies,
   watch_movie,
   remove_movie,
+  get_filtred_by_platform,
 } from "../repositories/movies_repositories.js";
 import { Movie, Watch } from "../types/movies_types.js";
 
@@ -55,4 +56,14 @@ async function delete_movie(req: Request, res: Response) {
   }
 }
 
-export { create_movie, read_movies, update_movie, delete_movie };
+async function filter_movies(req: Request, res: Response) {
+  try {
+    const movies = (await get_filtred_by_platform()).rows;
+    return res.status(200).send(movies);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+}
+
+export { create_movie, read_movies, update_movie, delete_movie, filter_movies };
